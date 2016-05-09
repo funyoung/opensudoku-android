@@ -23,7 +23,15 @@ package cz.romario.opensudoku.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import cz.romario.opensudoku.R;
 import cz.romario.opensudoku.game.SudokuGame;
@@ -34,6 +42,15 @@ import cz.romario.opensudoku.game.SudokuGame;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
+
+    private static final String EXTRA_DATA_ASSET = "";
+    private static final String SUFFIX_EXTRA_SDM = "sdm";
+    private static final String SUFFIX_EXTRA_OPENSUDOKU = "opensudoku";
+    private static final int EXTRA_FOLDER_INDEX = 1001;
+    private static final int DATA_LINE_LENGTH = 81;
+
+    private final ArrayList<String> openSudokuList = new ArrayList<>();
+    private final ArrayList<String> sdmSudokuList = new ArrayList<>();
 
     public static final int DATABASE_VERSION = 8;
 
@@ -157,7 +174,64 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertSudoku(db, 3, 89, "Hard29", "002001000068000003000086090900002086804000102520800009080140000100000920000700500");
         insertSudoku(db, 3, 90, "Hard30", "000030065460950200000086004003070006004090100500010300200140000007065028630020000");
 
+        readExtraGameData(EXTRA_DATA_ASSET);
+
+        insertExtraSudoku(db, 91);
+
         createIndexes(db);
+    }
+
+    private void insertExtraSudoku(SQLiteDatabase db, int sudokuIndex) {
+        int folderIndex = EXTRA_FOLDER_INDEX;
+        int sId = sudokuIndex;
+        for (String file : openSudokuList) {
+        }
+
+        for (String file : sdmSudokuList) {
+            try {
+                String name = file.replace("." + SUFFIX_EXTRA_SDM, "");
+                insertFolder(db, folderIndex, name);
+                InputStream is = mContext.getAssets().open(file);
+                InputStreamReader reader = new InputStreamReader(is);
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String str;
+                int offset = 1;
+                while ((str = bufferedReader.readLine()) != null) {
+                    if (str.length() == DATA_LINE_LENGTH) {
+                        insertSudoku(db, folderIndex, sId++, file + offset++, str);
+                    } else {
+                        Log.e(TAG, "Invalid line data: " + str);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "insertExtraSudoku, exception = " + e.getMessage());
+            } finally {
+                folderIndex++;
+            }
+        }
+    }
+
+    private void readExtraGameData(String path) {
+        String[] list;
+        try {
+            list = mContext.getAssets().list(path);
+            if (list.length > 0) {
+                for (String item : list) {
+                    readExtraGameData(TextUtils.isEmpty(path) ? item : path + File.separator + item);
+                }
+            } else if (list.length == 0) {
+                // pare data from path.
+                if (path.endsWith(SUFFIX_EXTRA_OPENSUDOKU)) {
+                    openSudokuList.add(path);
+                } else if (path.endsWith(SUFFIX_EXTRA_SDM)) {
+                    sdmSudokuList.add(path);
+                } else {
+                    Log.d(TAG, "Unknown file name: " + path);
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "readExtraGameData, exception = " + e.getMessage());
+        }
     }
 
     private void insertFolder(SQLiteDatabase db, long folderID, String folderName) {

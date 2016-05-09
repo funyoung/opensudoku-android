@@ -28,7 +28,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -37,7 +36,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -88,20 +86,20 @@ public class FolderListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.folder_list);
-        View getMorePuzzles = (View) findViewById(R.id.get_more_puzzles);
+//        View getMorePuzzles = (View) findViewById(R.id.get_more_puzzles);
 
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
         // Inform the list we provide context menus for items
         getListView().setOnCreateContextMenuListener(this);
 
-        getMorePuzzles.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://code.google.com/p/opensudoku-android/wiki/Puzzles"));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
+//        getMorePuzzles.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://code.google.com/p/opensudoku-android/wiki/Puzzles"));
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+//            }
+//        });
 
         mDatabase = new SudokuDatabase(getApplicationContext());
         mCursor = mDatabase.getFolderList();
