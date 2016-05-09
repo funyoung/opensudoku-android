@@ -185,6 +185,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int folderIndex = EXTRA_FOLDER_INDEX;
         int sId = sudokuIndex;
         for (String file : openSudokuList) {
+            try {
+                String name = file.replace("." + SUFFIX_EXTRA_OPENSUDOKU, "");
+                InputStream is = mContext.getAssets().open(file);
+                InputStreamReader reader = new InputStreamReader(is);
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String str;
+                int offset = 1;
+                while ((str = bufferedReader.readLine()) != null) {
+                    str = str.trim();
+                    if (str.startsWith("<name>") && str.endsWith("</name>")) {
+                        name = str.replace("<name>", "").replace("</name>", "").trim();
+                    } else if (str.startsWith("<game data=") && str.endsWith("/>")) {
+                        str = str.replace("<game data=", "").replace("/>", "").replace('"', ' ').replace('\'', ' ').trim();
+
+                        if (str.length() == DATA_LINE_LENGTH && TextUtils.isDigitsOnly(str)) {
+                            if (offset == 1) {
+                                insertFolder(db, folderIndex, name);
+                            }
+                            insertSudoku(db, folderIndex, sId++, name + offset++, str);
+                        } else {
+                            Log.e(TAG, "Invalid line data: " + str);
+                        }
+                    } else {
+                        Log.v(TAG, "Skip line data: " + str);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "insertExtraSudoku, exception = " + e.getMessage());
+            } finally {
+                folderIndex++;
+            }
         }
 
         for (String file : sdmSudokuList) {
