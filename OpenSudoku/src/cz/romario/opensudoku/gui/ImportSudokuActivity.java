@@ -31,14 +31,14 @@ import android.os.Bundle;
  */
 public class ImportSudokuActivity extends Activity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		Intent intent = new Intent(getIntent());
-		intent.setClass(this, SudokuImportActivity.class);
-		startActivity(intent);
-		finish();
-	}
+        Intent intent = new Intent(getIntent());
+        intent.setClass(this, SudokuImportActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
 }

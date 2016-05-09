@@ -37,14 +37,14 @@ import android.os.Bundle;
  */
 public class FileImportActivity extends Activity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		Intent i = new Intent(this, ImportSudokuActivity.class);
-		i.setData(getIntent().getData());
-		startActivity(i);
-		finish();
-	}
+        Intent i = new Intent(this, ImportSudokuActivity.class);
+        i.setData(getIntent().getData());
+        startActivity(i);
+        finish();
+    }
 
 }
